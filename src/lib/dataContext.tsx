@@ -113,13 +113,63 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
             : [];
 
         // -------------------------
-        // MERGE
+        // MERGE & NORMALIZE CODES
         // -------------------------
-        const purchases = [...archivePurchases, ...currentPurchases];
-        const sales = [...archiveSales, ...currentSales];
+        const normalizeCode = (val: any) => {
+          if (val === undefined || val === null) return '';
+          const s = String(val).trim();
+          if (/^\d+$/.test(s)) {
+            return String(Number(s));
+          }
+          return s;
+        };
 
-        // STOCK = ONLY LIVE
-        const finalStocks = stocks;
+        const rawPurchases = [...archivePurchases, ...currentPurchases];
+        const rawSales = [...archiveSales, ...currentSales];
+        const rawStocks = stocks;
+
+        const nameMap = new Map<string, string>();
+        [...rawPurchases, ...rawStocks].forEach((item: any) => {
+          const code = normalizeCode(item.CODE || item.MalzemeKodu);
+          const name = item.NAME || item.MalzemeAd;
+          if (code && name) {
+            nameMap.set(code, name);
+          }
+        });
+        rawSales.forEach((s: any) => {
+          const code = normalizeCode(s.MalzemeKodu || s.CODE);
+          const name = s.MalzemeAd || s.NAME;
+          if (code && name && !nameMap.has(code)) {
+            nameMap.set(code, name);
+          }
+        });
+
+        const purchases = rawPurchases.map((p: any) => {
+          const code = normalizeCode(p.CODE);
+          return {
+            ...p,
+            CODE: code,
+            NAME: nameMap.get(code) || p.NAME
+          };
+        });
+
+        const sales = rawSales.map((s: any) => {
+          const code = normalizeCode(s.MalzemeKodu);
+          return {
+            ...s,
+            MalzemeKodu: code,
+            MalzemeAd: nameMap.get(code) || s.MalzemeAd
+          };
+        });
+
+        const finalStocks = rawStocks.map((st: any) => {
+          const code = normalizeCode(st.CODE);
+          return {
+            ...st,
+            CODE: code,
+            NAME: nameMap.get(code) || st.NAME
+          };
+        });
 
         // -------------------------
         // SET STATE
