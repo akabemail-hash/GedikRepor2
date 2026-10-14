@@ -34,9 +34,22 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
           return new Promise<any[]>((resolve, reject) => {
             Papa.parse(text, {
               header: true,
-              dynamicTyping: true,
+              dynamicTyping: false, // Keep text strings as strings to preserve leading zeros (e.g. "0046")
               skipEmptyLines: true,
-              complete: (results) => resolve(results.data),
+              complete: (results) => {
+                const parsed = (results.data as any[]).map(row => {
+                  const newRow: any = { ...row };
+                  // Convert numerical columns to numbers safely
+                  ['MIKTAR', 'BIRIM_FIYAT', 'NET_SATIS', 'HareketMiktar', 'BirimFiyat', 'NetTutar', 'STOCK'].forEach(field => {
+                    if (newRow[field] !== undefined && newRow[field] !== null && newRow[field] !== '') {
+                      const num = Number(String(newRow[field]).replace(',', '.'));
+                      if (!isNaN(num)) newRow[field] = num;
+                    }
+                  });
+                  return newRow;
+                });
+                resolve(parsed);
+              },
               error: (err: any) =>
                 reject(new Error(`CSV Parse Error in ${url}: ${err.message}`)),
             });
@@ -113,16 +126,9 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
             : [];
 
         // -------------------------
-        // MERGE & NORMALIZE CODES
+        // MERGE & PRESERVE TEXT CODES (WITHOUT DEDUPLICATION)
         // -------------------------
-        const normalizeCode = (val: any) => {
-          if (val === undefined || val === null) return '';
-          const s = String(val).trim();
-          if (/^\d+$/.test(s)) {
-            return String(Number(s));
-          }
-          return s;
-        };
+        const textCode = (val: any) => (val !== undefined && val !== null ? String(val).trim() : '');
 
         const rawPurchases = [...archivePurchases, ...currentPurchases];
         const rawSales = [...archiveSales, ...currentSales];
@@ -130,22 +136,23 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         const nameMap = new Map<string, string>();
         [...rawPurchases, ...rawStocks].forEach((item: any) => {
-          const code = normalizeCode(item.CODE || item.MalzemeKodu);
+          const code = textCode(item.CODE || item.MalzemeKodu);
           const name = item.NAME || item.MalzemeAd;
           if (code && name) {
             nameMap.set(code, name);
           }
         });
         rawSales.forEach((s: any) => {
-          const code = normalizeCode(s.MalzemeKodu || s.CODE);
+          const code = textCode(s.MalzemeKodu || s.CODE);
           const name = s.MalzemeAd || s.NAME;
           if (code && name && !nameMap.has(code)) {
             nameMap.set(code, name);
           }
         });
 
+        // Map all purchase rows preserving every single transaction line
         const purchases = rawPurchases.map((p: any) => {
-          const code = normalizeCode(p.CODE);
+          const code = textCode(p.CODE);
           return {
             ...p,
             CODE: code,
@@ -153,8 +160,9 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
           };
         });
 
+        // Map all sales rows preserving every single transaction line
         const sales = rawSales.map((s: any) => {
-          const code = normalizeCode(s.MalzemeKodu);
+          const code = textCode(s.MalzemeKodu);
           return {
             ...s,
             MalzemeKodu: code,
@@ -163,7 +171,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         });
 
         const finalStocks = rawStocks.map((st: any) => {
-          const code = normalizeCode(st.CODE);
+          const code = textCode(st.CODE);
           return {
             ...st,
             CODE: code,
