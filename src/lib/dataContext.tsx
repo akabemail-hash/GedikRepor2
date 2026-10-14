@@ -126,11 +126,21 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
             : [];
 
         // -------------------------
-        // MERGE & PRESERVE TEXT CODES (WITHOUT DEDUPLICATION)
+        // MERGE & EXCLUDE 2026 FROM PURCHASE CSV
         // -------------------------
         const textCode = (val: any) => (val !== undefined && val !== null ? String(val).trim() : '');
+        const getRecordYear = (dateStr: string) => {
+          const d = new Date(dateStr);
+          return isNaN(d.getTime()) ? null : d.getFullYear();
+        };
 
-        const rawPurchases = [...archivePurchases, ...currentPurchases];
+        // Exclude currentYear (2026) purchases from CSV archive so they come from API
+        const archivePurchasesFiltered = archivePurchases.filter((p: any) => {
+          const year = getRecordYear(p.DATE_);
+          return year === null || year < currentYear;
+        });
+
+        const rawPurchases = [...archivePurchasesFiltered, ...currentPurchases];
         const rawSales = [...archiveSales, ...currentSales];
         const rawStocks = stocks;
 
