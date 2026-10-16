@@ -84,8 +84,8 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
           fetchAndParse('/csv/SALES.csv'),
 
           // ⚡ CURRENT YEAR (API)
-          fetchAPI(`/api/purchases?year=${currentYear}`),
-          fetchAPI(`/api/sales?year=${currentYear}`),
+          fetchAPI(`/api/purchases`),
+          fetchAPI(`/api/sales`),
           fetchAPI(`/api/stocks`), // 🔥 ONLY LIVE DATA
         ]);
 
@@ -133,15 +133,10 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
           const d = new Date(dateStr);
           return isNaN(d.getTime()) ? null : d.getFullYear();
         };
+   
 
-        // Exclude currentYear (2026) purchases from CSV archive so they come from API
-        const archivePurchasesFiltered = archivePurchases.filter((p: any) => {
-          const year = getRecordYear(p.DATE_);
-          return year === null || year < currentYear;
-        });
-
-        const rawPurchases = [...archivePurchasesFiltered, ...currentPurchases];
-        const rawSales = [...archiveSales, ...currentSales];
+        const rawPurchases = currentPurchases;
+        const rawSales = currentSales;
         const rawStocks = stocks;
 
         const nameMap = new Map<string, string>();
