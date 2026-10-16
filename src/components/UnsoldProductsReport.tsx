@@ -12,7 +12,6 @@ export default function UnsoldProductsReport() {
     if (!data) return [];
 
     // 1. Find the reference date (max sale date in the dataset) to represent "today"
-    // This ensures the report works even if the dataset is from a previous year
     let maxSaleDate = new Date();
     if (data.sales.length > 0) {
       const dates = data.sales
@@ -60,13 +59,8 @@ export default function UnsoldProductsReport() {
       }
     });
 
-    // 4. Filter products that haven't been sold in the last year
-    const result = Array.from(commercialProductsMap.values()).filter(product => {
-      const lastSaleDate = lastSaleDates.get(product.code);
-      
-      // If it has never been sold, or the last sale date is older than one year ago
-      return !lastSaleDate || lastSaleDate < oneYearAgo;
-    }).map(product => {
+    // 4. Filter products that haven't been sold in the last year AND have stock > 0
+    const result = Array.from(commercialProductsMap.values()).map(product => {
       const lastSaleDate = lastSaleDates.get(product.code);
       const currentStock = data.stocks.find(s => s.CODE === product.code)?.STOCK || 0;
       
@@ -75,6 +69,14 @@ export default function UnsoldProductsReport() {
         lastSaleDate: lastSaleDate || null,
         currentStock
       };
+    }).filter(product => {
+      // Satılmayanlar filtresi (Son 1 yıldır satılmamış veya hiç satılmamış)
+      const isUnsold = !product.lastSaleDate || product.lastSaleDate < oneYearAgo;
+      
+      // Stokta sıfırdan büyük olma şartı
+      const hasStock = product.currentStock > 0;
+
+      return isUnsold && hasStock;
     });
 
     // 5. Apply search filter
@@ -99,9 +101,9 @@ export default function UnsoldProductsReport() {
         <div>
           <h2 className="text-2xl font-bold text-slate-800 flex items-center gap-2">
             <CalendarX2 className="w-6 h-6 text-red-500" />
-            Satılmayan Mallar
+            Satılmayan Mallar (Stokta Var)
           </h2>
-          <p className="text-sm text-slate-500 mt-1">Son 1 ildə satışı olmayan ticari malların siyahısı</p>
+          <p className="text-sm text-slate-500 mt-1">Son 1 ildə satışı olmayan və anbarda stoku olan ticari malların siyahısı</p>
         </div>
         <div className="relative w-full md:w-64">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
@@ -134,7 +136,7 @@ export default function UnsoldProductsReport() {
                   <td className="p-4 text-sm text-slate-800 font-mono">{p.code}</td>
                   <td className="p-4 text-sm text-slate-800 font-medium">{p.name}</td>
                   <td className="p-4 text-sm text-slate-800 text-right">
-                    <span className={`px-2 py-1 rounded-md ${p.currentStock > 0 ? 'bg-blue-50 text-blue-700' : 'bg-slate-100 text-slate-600'}`}>
+                    <span className="px-2 py-1 rounded-md bg-blue-50 text-blue-700 font-semibold">
                       {p.currentStock.toFixed(2)}
                     </span>
                   </td>
@@ -147,7 +149,7 @@ export default function UnsoldProductsReport() {
                   <td className="p-4 text-sm">
                     <div className="flex items-center gap-1.5 text-red-600 bg-red-50 px-2.5 py-1 rounded-full w-fit">
                       <AlertCircle className="w-3.5 h-3.5" />
-                      <span className="text-xs font-medium">Hərəkətsiz</span>
+                      <span className="text-xs font-medium">Hərəkətsiz Stok</span>
                     </div>
                   </td>
                 </tr>
