@@ -200,7 +200,7 @@ export default function PurchaseReport() {
                       <td className="p-4 text-sm text-gray-600 whitespace-nowrap">{new Date(p.DATE_).toLocaleDateString()}</td>
                       <td className="p-4 text-sm text-gray-800 font-mono">{p.CODE}</td>
                       <td className="p-4 text-sm text-gray-800">{p.NAME}</td>
-                      <td className="p-4 text-sm text-gray-600 font-medium">{birimVal}</td>
+                      <td className="p-4 text-sm text-gray-600 font-medium">{p.BIRIM}</td>
                       <td className="p-4 text-sm text-gray-600 truncate max-w-[200px]" title={p.CARI_ADI}>{p.CARI_ADI}</td>
                       <td className="p-4 text-sm text-gray-800 text-right">{p.MIKTAR}</td>
                       <td className="p-4 text-sm text-gray-800 text-right">{Number(p.BIRIM_FIYAT/1.7 || 0).toFixed(2)}</td>

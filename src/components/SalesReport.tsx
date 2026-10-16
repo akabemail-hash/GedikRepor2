@@ -250,7 +250,7 @@ export default function SalesReport() {
                       <td className="p-4 text-sm text-slate-600 whitespace-nowrap">{new Date(s.FATURATAR).toLocaleDateString()}</td>
                       <td className="p-4 text-sm text-slate-800 font-mono">{s.MalzemeKodu}</td>
                       <td className="p-4 text-sm text-slate-800">{s.MalzemeAd}</td>
-                      <td className="p-4 text-sm text-slate-600 font-medium">{birimVal}</td>
+                      <td className="p-4 text-sm text-slate-600 font-medium">{s.BIRIM}</td>
                       <td className="p-4 text-sm text-slate-600 truncate max-w-[200px]" title={s.CUNVANI}>{s.CUNVANI}</td>
                       <td className="p-4 text-sm text-slate-800 text-right">{s.HareketMiktar}</td>
                       <td className="p-4 text-sm text-slate-800 text-right">{Number(s.BirimFiyat || 0).toFixed(2)} ₼</td>
