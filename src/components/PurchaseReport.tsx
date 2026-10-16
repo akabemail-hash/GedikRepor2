@@ -52,9 +52,9 @@ export default function PurchaseReport() {
       if (sortField === 'DATE_') {
         aVal = new Date(a.DATE_).getTime();
         bVal = new Date(b.DATE_).getTime();
-      } else if (sortField === 'Birim') {
-        aVal = String(a.Birim || a.BIRIM || a.BirimAd || '').toLowerCase();
-        bVal = String(b.Birim || b.BIRIM || b.BirimAd || '').toLowerCase();
+      } else if (sortField === 'BIRIM') {
+        aVal = String(a.Birimi || a.BIRIM || a.BirimAd || '').toLowerCase();
+        bVal = String(b.Birimi || b.BIRIM || b.BirimAd || '').toLowerCase();
       } else if (typeof aVal === 'string' || typeof bVal === 'string') {
         aVal = String(aVal || '').toLowerCase();
         bVal = String(bVal || '').toLowerCase();
@@ -175,8 +175,8 @@ export default function PurchaseReport() {
                   <th onClick={() => handleSort('NAME')} className="p-4 font-medium text-gray-600 text-sm cursor-pointer hover:bg-gray-100 transition-colors">
                     Ad {renderSortIcon('NAME')}
                   </th>
-                  <th onClick={() => handleSort('Birim')} className="p-4 font-medium text-gray-600 text-sm cursor-pointer hover:bg-gray-100 transition-colors">
-                    Birim {renderSortIcon('Birim')}
+                  <th onClick={() => handleSort('BIRIM')} className="p-4 font-medium text-gray-600 text-sm cursor-pointer hover:bg-gray-100 transition-colors">
+                    Birim {renderSortIcon('BIRIM')}
                   </th>
                   <th onClick={() => handleSort('CARI_ADI')} className="p-4 font-medium text-gray-600 text-sm cursor-pointer hover:bg-gray-100 transition-colors">
                     Təchizatçı {renderSortIcon('CARI_ADI')}
@@ -194,13 +194,13 @@ export default function PurchaseReport() {
               </thead>
               <tbody>
                 {(paginatedData as PurchaseRecord[]).map((p, i) => {
-                  const birimVal = p.Birim || p.BIRIM || p.BirimAd || 'Ədəd';
+                  const birimVal =  p.BIRIM ;
                   return (
                     <tr key={i} className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors">
                       <td className="p-4 text-sm text-gray-600 whitespace-nowrap">{new Date(p.DATE_).toLocaleDateString()}</td>
                       <td className="p-4 text-sm text-gray-800 font-mono">{p.CODE}</td>
                       <td className="p-4 text-sm text-gray-800">{p.NAME}</td>
-                      <td className="p-4 text-sm text-gray-600 font-medium">{p.BIRIM}</td>
+                      <td className="p-4 text-sm text-gray-600 font-medium">{birimVal}</td>
                       <td className="p-4 text-sm text-gray-600 truncate max-w-[200px]" title={p.CARI_ADI}>{p.CARI_ADI}</td>
                       <td className="p-4 text-sm text-gray-800 text-right">{p.MIKTAR}</td>
                       <td className="p-4 text-sm text-gray-800 text-right">{Number(p.BIRIM_FIYAT/1.7 || 0).toFixed(2)}</td>
