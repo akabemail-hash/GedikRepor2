@@ -7,7 +7,7 @@ export interface PurchaseRecord {
   NET_SATIS: number;
   CARI_ADI: string;
   MALZEME_TIPI?: string;
-  Birim?: string;
+  Birimi?: string;
   BIRIM?: string;
   BirimAd?: string;
 }
@@ -20,7 +20,7 @@ export interface SalesRecord {
   BirimFiyat: number;
   NetTutar: number;
   CUNVANI: string;
-  Birim?: string;
+  Birimi?: string;
   BIRIM?: string;
   BirimAd?: string;
 }

@@ -55,9 +55,9 @@ export default function SalesReport() {
       if (sortField === 'FATURATAR') {
         aVal = new Date(a.FATURATAR).getTime();
         bVal = new Date(b.FATURATAR).getTime();
-      } else if (sortField === 'Birim') {
-        aVal = String(a.Birim || a.BIRIM || a.BirimAd || '').toLowerCase();
-        bVal = String(b.Birim || b.BIRIM || b.BirimAd || '').toLowerCase();
+      } else if (sortField === 'Birimi') {
+        aVal = String(a.Birimi || a.BIRIM || a.BirimAd || '').toLowerCase();
+        bVal = String(b.Birimi || b.BIRIM || b.BirimAd || '').toLowerCase();
       } else if (typeof aVal === 'string' || typeof bVal === 'string') {
         aVal = String(aVal || '').toLowerCase();
         bVal = String(bVal || '').toLowerCase();
@@ -225,8 +225,8 @@ export default function SalesReport() {
                   <th onClick={() => handleSort('MalzemeAd')} className="p-4 font-semibold text-slate-600 text-sm cursor-pointer hover:bg-slate-100 transition-colors">
                     Ad {renderSortIcon('MalzemeAd')}
                   </th>
-                  <th onClick={() => handleSort('Birim')} className="p-4 font-semibold text-slate-600 text-sm cursor-pointer hover:bg-slate-100 transition-colors">
-                    Birim {renderSortIcon('Birim')}
+                  <th onClick={() => handleSort('Birimi')} className="p-4 font-semibold text-slate-600 text-sm cursor-pointer hover:bg-slate-100 transition-colors">
+                    Birim {renderSortIcon('Birimi')}
                   </th>
                   <th onClick={() => handleSort('CUNVANI')} className="p-4 font-semibold text-slate-600 text-sm cursor-pointer hover:bg-slate-100 transition-colors">
                     Müştəri {renderSortIcon('CUNVANI')}
@@ -244,13 +244,13 @@ export default function SalesReport() {
               </thead>
               <tbody>
                 {(paginatedData as SalesRecord[]).map((s, i) => {
-                  const birimVal = s.Birim || s.BIRIM || s.BirimAd || 'Ədəd';
+                  const birimVal = s.Birimi || s.Birimi || s.Birimi || 'Ədəd';
                   return (
                     <tr key={i} className="border-b border-slate-100 hover:bg-slate-50/50 transition-colors">
                       <td className="p-4 text-sm text-slate-600 whitespace-nowrap">{new Date(s.FATURATAR).toLocaleDateString()}</td>
                       <td className="p-4 text-sm text-slate-800 font-mono">{s.MalzemeKodu}</td>
                       <td className="p-4 text-sm text-slate-800">{s.MalzemeAd}</td>
-                      <td className="p-4 text-sm text-slate-600 font-medium">{s.BIRIM}</td>
+                      <td className="p-4 text-sm text-slate-600 font-medium">{s.Birimi}</td>
                       <td className="p-4 text-sm text-slate-600 truncate max-w-[200px]" title={s.CUNVANI}>{s.CUNVANI}</td>
                       <td className="p-4 text-sm text-slate-800 text-right">{s.HareketMiktar}</td>
                       <td className="p-4 text-sm text-slate-800 text-right">{Number(s.BirimFiyat || 0).toFixed(2)} ₼</td>
